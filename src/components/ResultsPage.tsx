@@ -7,6 +7,12 @@ interface ResultsPageProps {
 }
 
 const ResultsPage = ({ matches, onRestart }: ResultsPageProps) => {
+  // Calculate percentages based on position in matches array
+  const getMatchPercentage = (index: number) => {
+    // First match is 100%, second is 85%, third is 70%
+    return 100 - (index * 15);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -23,8 +29,13 @@ const ResultsPage = ({ matches, onRestart }: ResultsPageProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.2 }}
-            className="bg-white p-6 rounded-xl shadow-lg"
+            className="bg-white p-6 rounded-xl shadow-lg relative"
           >
+            <div className="absolute top-4 right-4">
+              <div className="bg-quiz-light text-quiz-primary font-bold rounded-full px-3 py-1">
+                {getMatchPercentage(index)}%
+              </div>
+            </div>
             <h3 className="text-xl font-semibold text-quiz-primary mb-3">
               {match.title}
             </h3>
