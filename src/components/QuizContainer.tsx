@@ -57,7 +57,7 @@ const QuizContainer = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100">
       <ProgressBar current={currentQuestion + 1} total={questions.length} />
       <AnimatePresence mode="wait">
         <QuestionCard

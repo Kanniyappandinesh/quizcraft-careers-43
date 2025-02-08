@@ -19,10 +19,10 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="mb-8"
       >
-        <h1 className="text-5xl font-bold text-quiz-primary mb-4">
+        <h1 className="text-6xl font-bold bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-transparent bg-clip-text mb-4">
           Discover Your Ideal Career Path
         </h1>
-        <div className="h-1 w-24 bg-quiz-accent mx-auto rounded-full"></div>
+        <div className="h-1 w-24 bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] mx-auto rounded-full"></div>
       </motion.div>
 
       <motion.p 
@@ -43,7 +43,7 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
       >
         <Button 
           onClick={onStart}
-          className="bg-quiz-accent hover:bg-quiz-primary text-white px-8 py-6 rounded-lg text-xl transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+          className="bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] hover:opacity-90 text-white px-8 py-6 rounded-full text-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl transform"
         >
           Start Your Career Journey
         </Button>
@@ -64,8 +64,13 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
           { title: "Instant Results", description: "Get your career matches immediately" },
           { title: "Detailed Insights", description: "Including skills needed and job outlook" }
         ].map((feature, index) => (
-          <div key={index} className="p-6 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow">
-            <h3 className="text-lg font-semibold text-quiz-primary mb-2">{feature.title}</h3>
+          <div 
+            key={index} 
+            className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-purple-100"
+          >
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-transparent bg-clip-text mb-2">
+              {feature.title}
+            </h3>
             <p className="text-gray-600">{feature.description}</p>
           </div>
         ))}
