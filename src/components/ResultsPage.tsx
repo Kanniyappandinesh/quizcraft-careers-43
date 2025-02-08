@@ -76,9 +76,15 @@ const ResultsPage = ({ matches, onRestart }: ResultsPageProps) => {
       animate={{ opacity: 1 }}
       className="max-w-4xl mx-auto p-8"
     >
-      <h2 className="text-3xl font-bold text-quiz-primary mb-8 text-center">
-        Your Career Matches
-      </h2>
+      <div className="mb-8 flex justify-between items-center">
+        <h2 className="text-3xl font-bold text-quiz-primary">
+          Your Career Matches
+        </h2>
+        <div className="text-sm text-gray-500">
+          {new Date().toLocaleDateString()}
+        </div>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {matches.map((match, index) => (
           <motion.div

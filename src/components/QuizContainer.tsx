@@ -1,10 +1,12 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { questions, getCareerMatches } from "@/utils/quizData";
 import WelcomeScreen from "./WelcomeScreen";
 import QuestionCard from "./QuestionCard";
 import ProgressBar from "./ProgressBar";
 import ResultsPage from "./ResultsPage";
 import { AnimatePresence } from "framer-motion";
+import { toast } from "@/components/ui/use-toast";
 
 const QuizContainer = () => {
   const [started, setStarted] = useState(false);
@@ -23,6 +25,18 @@ const QuizContainer = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
+      const matches = getCareerMatches(newAnswers);
+      // Save results to localStorage
+      const savedResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
+      const newResult = {
+        date: new Date().toISOString(),
+        matches
+      };
+      localStorage.setItem('quizResults', JSON.stringify([newResult, ...savedResults].slice(0, 5)));
+      toast({
+        title: "Results saved!",
+        description: "You can access your previous results from the dashboard.",
+      });
       setShowResults(true);
     }
   };
