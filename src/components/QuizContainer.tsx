@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { questions, getCareerMatches } from "@/utils/quizData";
 import WelcomeScreen from "./WelcomeScreen";
 import QuestionCard from "./QuestionCard";
@@ -26,19 +26,58 @@ const QuizContainer = () => {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       const matches = getCareerMatches(newAnswers);
-      // Save results to localStorage
+      // Save results with timestamp and detailed analysis
       const savedResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
       const newResult = {
         date: new Date().toISOString(),
-        matches
+        matches,
+        answers: newAnswers,
+        strengths: calculateStrengths(newAnswers),
+        growthAreas: identifyGrowthAreas(newAnswers)
       };
-      localStorage.setItem('quizResults', JSON.stringify([newResult, ...savedResults].slice(0, 5)));
+      localStorage.setItem('quizResults', JSON.stringify([newResult, ...savedResults].slice(0, 10)));
       toast({
-        title: "Results saved!",
-        description: "You can access your previous results from the dashboard.",
+        title: "Analysis Complete! 🎉",
+        description: "View your personalized career insights in the dashboard.",
       });
       setShowResults(true);
     }
+  };
+
+  const calculateStrengths = (answers: string[]) => {
+    const strengths = {
+      technical: 0,
+      creative: 0,
+      analytical: 0,
+      interpersonal: 0,
+      leadership: 0
+    };
+    
+    // Calculate strength scores based on answers
+    answers.forEach((answer, index) => {
+      const question = questions[index];
+      if (answer.includes('tech') || answer.includes('code')) strengths.technical += 1;
+      if (answer.includes('design') || answer.includes('create')) strengths.creative += 1;
+      if (answer.includes('data') || answer.includes('research')) strengths.analytical += 1;
+      if (answer.includes('team') || answer.includes('communicate')) strengths.interpersonal += 1;
+      if (answer.includes('lead') || answer.includes('manage')) strengths.leadership += 1;
+    });
+
+    return strengths;
+  };
+
+  const identifyGrowthAreas = (answers: string[]) => {
+    // Identify areas for improvement based on answer patterns
+    const areas = [];
+    const strengths = calculateStrengths(answers);
+    
+    if (strengths.technical < 3) areas.push('Technical Skills');
+    if (strengths.creative < 3) areas.push('Creative Thinking');
+    if (strengths.analytical < 3) areas.push('Analytical Abilities');
+    if (strengths.interpersonal < 3) areas.push('Communication Skills');
+    if (strengths.leadership < 3) areas.push('Leadership Capabilities');
+    
+    return areas;
   };
 
   const handleRestart = () => {
