@@ -48,3 +48,11 @@ export interface SuccessStory {
   quote: string;
   story: string;
 }
+
+export interface SkillComparison {
+  userSkill: string;
+  skillLevel: number;
+  requiredLevel: number;
+  importance: 'high' | 'medium' | 'low';
+  match: 'perfect' | 'good' | 'gap';
+}

@@ -4,6 +4,8 @@ import type { CareerMatch } from "@/utils/quizData";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
+import SkillComparison from "./SkillComparison";
+import { useState } from "react";
 
 interface ResultsPageProps {
   matches: CareerMatch[];
@@ -11,10 +13,24 @@ interface ResultsPageProps {
 }
 
 const ResultsPage = ({ matches, onRestart }: ResultsPageProps) => {
+  const [showSkillComparison, setShowSkillComparison] = useState(false);
+  
   // Calculate percentages based on position in matches array
   const getMatchPercentage = (index: number) => {
     // First match is 100%, second is 85%, third is 70%
     return 100 - (index * 15);
+  };
+
+  // Get strengths from localStorage (most recent quiz result)
+  const getStrengths = () => {
+    const savedResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
+    return savedResults[0]?.strengths || {
+      technical: 0,
+      creative: 0,
+      analytical: 0,
+      interpersonal: 0,
+      leadership: 0
+    };
   };
 
   const getCourseRecommendations = (career: string) => {
@@ -86,6 +102,30 @@ const ResultsPage = ({ matches, onRestart }: ResultsPageProps) => {
         <div className="text-sm text-gray-500">
           {new Date().toLocaleDateString()}
         </div>
+      </div>
+
+      <div className="mb-6">
+        <Button 
+          variant={showSkillComparison ? "default" : "outline"}
+          onClick={() => setShowSkillComparison(!showSkillComparison)}
+          className="mb-4"
+        >
+          {showSkillComparison ? "Hide Skill Comparison" : "Compare Your Skills"}
+        </Button>
+        
+        {showSkillComparison && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-6"
+          >
+            <SkillComparison 
+              matches={matches} 
+              strengths={getStrengths()} 
+            />
+          </motion.div>
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
