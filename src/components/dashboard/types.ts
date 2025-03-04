@@ -25,3 +25,26 @@ export interface AnimationVariants {
   hidden: object;
   show: object;
 }
+
+export interface CareerDetail {
+  title: string;
+  description: string;
+  longDescription: string;
+  skills: string[];
+  outlook: string;
+  education: string;
+  salary: string;
+  dayInLife: string;
+  successStories: SuccessStory[];
+  videoEmbeds: string[];
+  relatedCareers: string[];
+}
+
+export interface SuccessStory {
+  name: string;
+  role: string;
+  company: string;
+  imageUrl: string;
+  quote: string;
+  story: string;
+}

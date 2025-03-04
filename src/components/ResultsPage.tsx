@@ -1,6 +1,9 @@
 
 import { motion } from "framer-motion";
 import type { CareerMatch } from "@/utils/quizData";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { ExternalLink } from "lucide-react";
 
 interface ResultsPageProps {
   matches: CareerMatch[];
@@ -123,6 +126,17 @@ const ResultsPage = ({ matches, onRestart }: ResultsPageProps) => {
               <h4 className="font-semibold mb-2">Education Required:</h4>
               <p className="text-sm text-gray-600">{match.education}</p>
             </div>
+            
+            <div className="mb-4">
+              <Link 
+                to={`/career/${match.title.toLowerCase().replace(/\s+/g, "-")}`}
+                className="inline-flex items-center text-quiz-primary hover:text-quiz-accent"
+              >
+                <span>Explore Career Details</span>
+                <ExternalLink className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+            
             <div>
               <h4 className="font-semibold mb-2">Recommended Courses:</h4>
               <ul className="text-sm space-y-2">
