@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -28,6 +29,8 @@ export default {
           primary: "#2A4365",
           accent: "#4FD1C5",
           light: "#EBF8FF",
+          dark: "#1A1F2C",
+          darkAccent: "#38B2AC",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",

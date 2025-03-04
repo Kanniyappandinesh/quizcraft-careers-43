@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -29,7 +30,7 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="text-xl text-gray-600 mb-8 leading-relaxed"
+        className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed"
       >
         Take our comprehensive career assessment to uncover career paths that match your personality,
         skills, and preferences. Answer 15 questions and get personalized recommendations to guide your professional journey.
@@ -48,7 +49,7 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
           Start Your Career Journey
         </Button>
         
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Takes approximately 8 minutes to complete
         </p>
       </motion.div>
@@ -66,12 +67,12 @@ const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
         ].map((feature, index) => (
           <div 
             key={index} 
-            className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-purple-100"
+            className="p-6 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-purple-100 dark:border-gray-700"
           >
             <h3 className="text-lg font-semibold bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-transparent bg-clip-text mb-2">
               {feature.title}
             </h3>
-            <p className="text-gray-600">{feature.description}</p>
+            <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
           </div>
         ))}
       </motion.div>
