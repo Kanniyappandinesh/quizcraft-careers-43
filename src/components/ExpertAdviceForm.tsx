@@ -38,8 +38,11 @@ const ExpertAdviceForm = ({ careerField }: ExpertAdviceFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     
+    // Create a properly typed ExpertAdviceRequest object
     const request: ExpertAdviceRequest = {
-      ...values,
+      name: values.name,
+      email: values.email,
+      question: values.question,
       careerField,
       contactConsent: values.contactConsent
     };
