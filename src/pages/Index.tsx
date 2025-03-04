@@ -4,15 +4,15 @@ import QuizContainer from "@/components/QuizContainer";
 import Dashboard from "@/components/Dashboard";
 import DFDDiagram from "@/components/DFDDiagram";
 import { motion } from "framer-motion";
-import { Sparkles, FileDigit, LogOut, LogIn } from "lucide-react";
+import { Sparkles, FileDigit, LogOut, LogIn, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 const Index = () => {
-  const [showDashboard, setShowDashboard] = useState(false);
-  const [showDFD, setShowDFD] = useState(false);
+  const [activeModule, setActiveModule] = useState<'quiz' | 'dashboard' | 'dfd'>('quiz');
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -34,19 +34,30 @@ const Index = () => {
             CareerQuest
           </h1>
           <div className="flex gap-3">
-            <button
-              onClick={() => setShowDFD(!showDFD)}
-              className="px-6 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium flex items-center gap-2"
+            <Button
+              onClick={() => setActiveModule('quiz')}
+              variant={activeModule === 'quiz' ? 'secondary' : 'ghost'}
+              className={`hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium ${activeModule === 'quiz' ? 'bg-white/40' : 'bg-white/20'}`}
+            >
+              Quiz
+            </Button>
+            <Button
+              onClick={() => setActiveModule('dashboard')}
+              variant={activeModule === 'dashboard' ? 'secondary' : 'ghost'}
+              className={`hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium flex items-center gap-2 ${activeModule === 'dashboard' ? 'bg-white/40' : 'bg-white/20'}`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Dashboard
+            </Button>
+            <Button
+              onClick={() => setActiveModule('dfd')}
+              variant={activeModule === 'dfd' ? 'secondary' : 'ghost'}
+              className={`hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium flex items-center gap-2 ${activeModule === 'dfd' ? 'bg-white/40' : 'bg-white/20'}`}
             >
               <FileDigit className="w-4 h-4" />
-              {showDFD ? "Hide DFD" : "View DFD"}
-            </button>
-            <button
-              onClick={() => setShowDashboard(!showDashboard)}
-              className="px-6 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 font-medium flex items-center gap-2"
-            >
-              {showDashboard ? "Take Quiz" : "View Dashboard"}
-            </button>
+              View DFD
+            </Button>
+            <Separator orientation="vertical" className="h-8 bg-white/20" />
             {user ? (
               <Button
                 variant="ghost"
@@ -76,13 +87,9 @@ const Index = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto py-8 px-4"
       >
-        {showDFD ? (
-          <DFDDiagram />
-        ) : showDashboard ? (
-          <Dashboard />
-        ) : (
-          <QuizContainer />
-        )}
+        {activeModule === 'dfd' && <DFDDiagram />}
+        {activeModule === 'dashboard' && <Dashboard />}
+        {activeModule === 'quiz' && <QuizContainer />}
       </motion.div>
     </div>
   );

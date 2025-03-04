@@ -14,7 +14,7 @@ const StatCards = ({ totalStrengthScore, growthAreasCount, matchesCount, variant
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <motion.div variants={variants}>
-        <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-purple-50 to-white">
+        <Card className="hover:shadow-lg transition-shadow border-purple-200 bg-white">
           <CardHeader className="space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-purple-600 flex items-center gap-2">
               <Brain className="w-4 h-4" />
@@ -30,15 +30,15 @@ const StatCards = ({ totalStrengthScore, growthAreasCount, matchesCount, variant
       </motion.div>
 
       <motion.div variants={variants}>
-        <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-pink-50 to-white">
+        <Card className="hover:shadow-lg transition-shadow border-orange-200 bg-white">
           <CardHeader className="space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-pink-600 flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-orange-600 flex items-center gap-2">
               <Target className="w-4 h-4" />
               Growth Areas
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-pink-700">
+            <div className="text-2xl font-bold text-orange-700">
               {growthAreasCount}
             </div>
           </CardContent>
@@ -46,7 +46,7 @@ const StatCards = ({ totalStrengthScore, growthAreasCount, matchesCount, variant
       </motion.div>
 
       <motion.div variants={variants}>
-        <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50 to-white">
+        <Card className="hover:shadow-lg transition-shadow border-blue-200 bg-white">
           <CardHeader className="space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-600 flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />

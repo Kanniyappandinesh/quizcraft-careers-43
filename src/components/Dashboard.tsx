@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { questions } from "@/utils/quizData";
 import StatCards from "./dashboard/StatCards";
@@ -11,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
 
 const Dashboard = () => {
   const [savedResults, setSavedResults] = useState<SavedResult[]>([]);
@@ -21,7 +21,6 @@ const Dashboard = () => {
   const latestResult = savedResults[0] || null;
 
   useEffect(() => {
-    // First try to get results from localStorage
     const localResults = JSON.parse(localStorage.getItem('quizResults') || '[]') as SavedResult[];
     
     if (localResults.length > 0) {
@@ -29,7 +28,6 @@ const Dashboard = () => {
       setLoading(false);
     }
     
-    // If user is logged in, get results from Supabase
     if (user) {
       fetchUserResults();
     } else {
@@ -65,14 +63,12 @@ const Dashboard = () => {
     }
   };
 
-  // Transform strength data for radar chart
   const strengthData = latestResult ? Object.entries(latestResult.strengths).map(([key, value]) => ({
     subject: key.charAt(0).toUpperCase() + key.slice(1),
     A: value,
     fullMark: 5,
   })) : [];
 
-  // Career categories distribution
   const careerCategories = [
     { name: 'Technology', count: 25 },
     { name: 'Business', count: 20 },
@@ -96,7 +92,6 @@ const Dashboard = () => {
     show: { opacity: 1, y: 0 }
   };
 
-  // Calculate the sum of strength values with proper type checking
   const getTotalStrengthScore = (): number => {
     if (!latestResult) return 0;
     
@@ -126,9 +121,8 @@ const Dashboard = () => {
       variants={container}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-10"
     >
-      {/* Auth status banner */}
       {!user && (
         <motion.div
           variants={item}
@@ -143,26 +137,51 @@ const Dashboard = () => {
         </motion.div>
       )}
 
-      {/* Quick Stats */}
-      <StatCards 
-        totalStrengthScore={getTotalStrengthScore()}
-        growthAreasCount={latestResult ? latestResult.growthAreas.length : 0}
-        matchesCount={latestResult ? latestResult.matches.length : 0}
-        variants={item}
-      />
+      <motion.div variants={item} className="text-center pb-2">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-transparent bg-clip-text">Your Career Dashboard</h2>
+        <Separator className="mt-2 mb-6 mx-auto w-24 bg-gradient-to-r from-[#8B5CF6] to-[#D946EF]" />
+      </motion.div>
 
-      {/* Strength Radar Chart */}
+      <motion.div 
+        variants={item} 
+        className="p-6 rounded-xl bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 shadow-sm"
+      >
+        <h3 className="text-lg font-semibold text-purple-800 mb-4">Career Stats Overview</h3>
+        <StatCards 
+          totalStrengthScore={getTotalStrengthScore()}
+          growthAreasCount={latestResult ? latestResult.growthAreas.length : 0}
+          matchesCount={latestResult ? latestResult.matches.length : 0}
+          variants={item}
+        />
+      </motion.div>
+
       {latestResult && (
-        <StrengthRadarChart strengthData={strengthData} variants={item} />
+        <motion.div 
+          variants={item}
+          className="p-6 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 shadow-sm"
+        >
+          <h3 className="text-lg font-semibold text-blue-800 mb-4">Your Skill Profile</h3>
+          <StrengthRadarChart strengthData={strengthData} variants={item} />
+        </motion.div>
       )}
 
-      {/* Growth Areas */}
       {latestResult && latestResult.growthAreas.length > 0 && (
-        <GrowthOpportunities growthAreas={latestResult.growthAreas} variants={item} />
+        <motion.div 
+          variants={item}
+          className="p-6 rounded-xl bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 shadow-sm"
+        >
+          <h3 className="text-lg font-semibold text-orange-800 mb-4">Development Opportunities</h3>
+          <GrowthOpportunities growthAreas={latestResult.growthAreas} variants={item} />
+        </motion.div>
       )}
 
-      {/* Career Distribution */}
-      <CareerDistributionChart careerCategories={careerCategories} variants={item} />
+      <motion.div 
+        variants={item}
+        className="p-6 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-100 border border-emerald-200 shadow-sm"
+      >
+        <h3 className="text-lg font-semibold text-emerald-800 mb-4">Career Field Distribution</h3>
+        <CareerDistributionChart careerCategories={careerCategories} variants={item} />
+      </motion.div>
     </motion.div>
   );
 };

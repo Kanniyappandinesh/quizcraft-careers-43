@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { questions, getCareerMatches } from "@/utils/quizData";
 import WelcomeScreen from "./WelcomeScreen";
@@ -140,7 +141,10 @@ const QuizContainer = () => {
   }
 
   return (
-    <div className="p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100">
+    <div className="p-8 bg-gradient-to-r from-purple-50 to-indigo-50 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200">
+      <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-transparent bg-clip-text mb-6">
+        Career Assessment Quiz
+      </h2>
       <ProgressBar current={currentQuestion + 1} total={questions.length} />
       <AnimatePresence mode="wait">
         <QuestionCard
