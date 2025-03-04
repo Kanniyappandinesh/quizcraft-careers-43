@@ -5,8 +5,25 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { motion } from "framer-motion";
 import { Brain, Target, TrendingUp, Users, Lightbulb, Trophy } from "lucide-react";
 
+interface StrengthValues {
+  technical: number;
+  creative: number;
+  analytical: number;
+  interpersonal: number;
+  leadership: number;
+  [key: string]: number;
+}
+
+interface SavedResult {
+  date: string;
+  matches: any[];
+  answers: string[];
+  strengths: StrengthValues;
+  growthAreas: string[];
+}
+
 const Dashboard = () => {
-  const savedResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
+  const savedResults = JSON.parse(localStorage.getItem('quizResults') || '[]') as SavedResult[];
   const latestResult = savedResults[0] || null;
 
   // Transform strength data for radar chart
@@ -40,6 +57,13 @@ const Dashboard = () => {
     show: { opacity: 1, y: 0 }
   };
 
+  // Calculate the sum of strength values with proper type checking
+  const getTotalStrengthScore = (): number => {
+    if (!latestResult) return 0;
+    
+    return Object.values(latestResult.strengths).reduce((sum, value) => sum + value, 0);
+  };
+
   return (
     <motion.div
       variants={container}
@@ -59,7 +83,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-700">
-                {latestResult ? Object.values(latestResult.strengths).reduce((a: any, b: any) => a + b, 0) : 0}
+                {getTotalStrengthScore()}
               </div>
             </CardContent>
           </Card>
