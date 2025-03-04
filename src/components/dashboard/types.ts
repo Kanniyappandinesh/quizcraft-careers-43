@@ -56,3 +56,11 @@ export interface SkillComparison {
   importance: 'high' | 'medium' | 'low';
   match: 'perfect' | 'good' | 'gap';
 }
+
+export interface ExpertAdviceRequest {
+  name: string;
+  email: string;
+  careerField: string;
+  question: string;
+  contactConsent: boolean;
+}
