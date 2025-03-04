@@ -4,12 +4,13 @@ import QuizContainer from "@/components/QuizContainer";
 import Dashboard from "@/components/Dashboard";
 import DFDDiagram from "@/components/DFDDiagram";
 import { motion } from "framer-motion";
-import { Sparkles, FileDigit, LogOut, LogIn, LayoutDashboard } from "lucide-react";
+import { Sparkles, FileDigit, HelpCircle, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
+import NavigationButtons from "@/components/NavigationButtons";
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState<'quiz' | 'dashboard' | 'dfd'>('quiz');
@@ -58,25 +59,7 @@ const Index = () => {
               View DFD
             </Button>
             <Separator orientation="vertical" className="h-8 bg-white/20" />
-            {user ? (
-              <Button
-                variant="ghost"
-                className="text-white hover:bg-white/20"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                className="text-white hover:bg-white/20"
-                onClick={() => navigate('/auth')}
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                Sign In
-              </Button>
-            )}
+            <NavigationButtons currentPage="home" />
           </div>
         </div>
       </nav>

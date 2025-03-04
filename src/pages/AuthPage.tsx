@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import NavigationButtons from "@/components/NavigationButtons";
 
 const AuthPage = () => {
   const [email, setEmail] = useState("");
@@ -93,6 +94,9 @@ const AuthPage = () => {
             <h1 className="text-3xl font-bold text-[#8B5CF6] ml-2">CareerQuest</h1>
           </div>
           <p className="text-gray-600">Discover your perfect career path</p>
+          <div className="mt-4">
+            <NavigationButtons currentPage="auth" />
+          </div>
         </div>
 
         <Card>

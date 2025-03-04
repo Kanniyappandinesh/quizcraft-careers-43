@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CareerPage from "./pages/CareerPage";
 import AuthPage from "./pages/AuthPage";
+import HelpPage from "./pages/HelpPage";
 import { AuthProvider } from "./components/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/help" element={<HelpPage />} />
             <Route path="/career/:careerId" element={
               <ProtectedRoute>
                 <CareerPage />
