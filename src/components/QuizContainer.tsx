@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { questions, getCareerMatches } from "@/utils/quizData";
 import WelcomeScreen from "./WelcomeScreen";
@@ -51,14 +50,19 @@ const QuizContainer = () => {
       // If user is logged in, save to Supabase
       if (user) {
         try {
+          // Convert matches to a format compatible with Supabase's JSON type
+          const matchesForSupabase = JSON.parse(JSON.stringify(matches));
+          const strengthsForSupabase = JSON.parse(JSON.stringify(strengths));
+          const growthAreasForSupabase = JSON.parse(JSON.stringify(growthAreas));
+          
           const { error } = await supabase
             .from('quiz_results')
             .insert({
               user_id: user.id,
               answers: newAnswers,
-              matches: matches,
-              strengths: strengths,
-              growth_areas: growthAreas
+              matches: matchesForSupabase,
+              strengths: strengthsForSupabase,
+              growth_areas: growthAreasForSupabase
             });
             
           if (error) throw error;
@@ -108,7 +112,6 @@ const QuizContainer = () => {
   };
 
   const identifyGrowthAreas = (answers: string[]) => {
-    // Identify areas for improvement based on answer patterns
     const areas = [];
     const strengths = calculateStrengths(answers);
     

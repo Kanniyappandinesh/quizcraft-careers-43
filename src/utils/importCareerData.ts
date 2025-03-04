@@ -16,24 +16,25 @@ export const importCareerDataToSupabase = async () => {
       return { success: true, message: "Career data already exists" };
     }
     
+    // Convert our data to the format expected by Supabase
+    const supabaseFormattedData = careerDetails.map(career => ({
+      title: career.title,
+      description: career.description,
+      long_description: career.longDescription,
+      skills: career.skills as unknown as any,
+      outlook: career.outlook,
+      education: career.education,
+      salary: career.salary,
+      day_in_life: career.dayInLife,
+      success_stories: career.successStories as unknown as any,
+      video_embeds: career.videoEmbeds as unknown as any,
+      related_careers: career.relatedCareers as unknown as any
+    }));
+    
     // Insert career data
     const { error: insertError } = await supabase
       .from('career_details')
-      .insert(
-        careerDetails.map(career => ({
-          title: career.title,
-          description: career.description,
-          long_description: career.longDescription,
-          skills: career.skills,
-          outlook: career.outlook,
-          education: career.education,
-          salary: career.salary,
-          day_in_life: career.dayInLife,
-          success_stories: career.successStories,
-          video_embeds: career.videoEmbeds,
-          related_careers: career.relatedCareers
-        }))
-      );
+      .insert(supabaseFormattedData);
       
     if (insertError) throw insertError;
     

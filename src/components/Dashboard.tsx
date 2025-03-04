@@ -49,11 +49,11 @@ const Dashboard = () => {
       
       if (data && data.length > 0) {
         const formattedResults: SavedResult[] = data.map(item => ({
-          date: item.date,
-          matches: item.matches,
-          answers: item.answers,
-          strengths: item.strengths,
-          growthAreas: item.growth_areas
+          date: item.date || item.created_at || new Date().toISOString(),
+          matches: item.matches as any[],
+          answers: item.answers as string[],
+          strengths: item.strengths as any,
+          growthAreas: item.growth_areas as string[]
         }));
         
         setSavedResults(formattedResults);
