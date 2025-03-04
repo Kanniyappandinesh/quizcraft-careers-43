@@ -1,36 +1,96 @@
 
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, TrendingUp, GraduationCap, DollarSign, Clock, Users, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { careerDetails } from "@/utils/careerData";
-import { CareerDetail } from "@/components/dashboard/types";
-import { useEffect, useState } from "react";
+import { ChevronLeft, Star, Book, BriefcaseBusiness, GraduationCap, Users } from "lucide-react";
 import ExpertAdviceForm from "@/components/ExpertAdviceForm";
+import { supabase } from "@/integrations/supabase/client";
+import { importCareerDataToSupabase } from "@/utils/importCareerData";
+import { CareerDetail } from "@/components/dashboard/types";
 
 const CareerPage = () => {
   const { careerId } = useParams<{ careerId: string }>();
   const [career, setCareer] = useState<CareerDetail | null>(null);
-  
+  const [loading, setLoading] = useState(true);
+  const normalizedCareerId = careerId?.replace(/-/g, " ");
+
   useEffect(() => {
-    if (careerId) {
-      const foundCareer = careerDetails.find(
-        (c) => c.title.toLowerCase().replace(/\s+/g, "-") === careerId
-      );
-      if (foundCareer) {
-        setCareer(foundCareer);
+    const fetchCareerData = async () => {
+      setLoading(true);
+      
+      try {
+        // First check if we have any career data
+        const { data, error } = await supabase
+          .from('career_details')
+          .select('*')
+          .ilike('title', normalizedCareerId || '')
+          .maybeSingle();
+          
+        if (error) throw error;
+        
+        // If no data, try to import from local data
+        if (!data) {
+          await importCareerDataToSupabase();
+          
+          // Try again
+          const { data: newData, error: newError } = await supabase
+            .from('career_details')
+            .select('*')
+            .ilike('title', normalizedCareerId || '')
+            .maybeSingle();
+            
+          if (newError) throw newError;
+          
+          if (newData) {
+            setCareer(formatCareerData(newData));
+          }
+        } else {
+          setCareer(formatCareerData(data));
+        }
+      } catch (error) {
+        console.error("Error fetching career details:", error);
+      } finally {
+        setLoading(false);
       }
+    };
+    
+    if (normalizedCareerId) {
+      fetchCareerData();
     }
-  }, [careerId]);
+  }, [normalizedCareerId]);
+  
+  const formatCareerData = (data: any): CareerDetail => {
+    return {
+      title: data.title,
+      description: data.description,
+      longDescription: data.long_description,
+      skills: data.skills,
+      outlook: data.outlook,
+      education: data.education,
+      salary: data.salary,
+      dayInLife: data.day_in_life,
+      successStories: data.success_stories,
+      videoEmbeds: data.video_embeds,
+      relatedCareers: data.related_careers
+    };
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] via-[#e2d1c3] to-[#fdfcfb] p-8 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
 
   if (!career) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Career not found</h2>
+      <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] via-[#e2d1c3] to-[#fdfcfb] p-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">Career Not Found</h1>
+          <p className="mb-6">We couldn't find details for this career path.</p>
           <Link to="/">
             <Button>Return to Home</Button>
           </Link>
@@ -40,211 +100,198 @@ const CareerPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] via-[#e2d1c3] to-[#fdfcfb]">
-      <div className="container mx-auto py-12 px-4">
-        <Link to="/" className="inline-flex items-center text-quiz-primary hover:text-quiz-accent mb-8">
-          <ArrowLeft className="mr-2 h-5 w-5" />
-          Back to Dashboard
+    <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] via-[#e2d1c3] to-[#fdfcfb] p-4 md:p-8">
+      <div className="max-w-5xl mx-auto">
+        <Link to="/" className="inline-flex items-center text-purple-600 hover:text-purple-800 mb-6">
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Back to Home
         </Link>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="bg-white rounded-xl shadow-lg overflow-hidden"
         >
-          <div className="bg-white rounded-xl shadow-xl overflow-hidden mb-10">
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-12">
-              <h1 className="text-4xl font-bold mb-4">{career.title}</h1>
-              <p className="text-xl opacity-90">{career.description}</p>
+          <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-6 md:p-10 text-white">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">{career.title}</h1>
+            <p className="text-lg md:text-xl opacity-90">{career.description}</p>
+            <div className="flex flex-wrap gap-2 mt-4">
+              {career.skills.slice(0, 4).map((skill, index) => (
+                <span key={index} className="bg-white/20 px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+                  {skill}
+                </span>
+              ))}
+              {career.skills.length > 4 && (
+                <span className="bg-white/20 px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+                  +{career.skills.length - 4} more
+                </span>
+              )}
             </div>
-            
-            <Tabs defaultValue="overview" className="px-8 py-8">
-              <TabsList className="mb-8 w-full justify-start">
-                <TabsTrigger value="overview">Career Overview</TabsTrigger>
-                <TabsTrigger value="advice">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Expert Advice
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="overview">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                  <InfoCard 
-                    icon={<TrendingUp className="h-5 w-5 text-indigo-500" />} 
-                    title="Job Outlook" 
-                    value={career.outlook} 
-                  />
-                  <InfoCard 
-                    icon={<GraduationCap className="h-5 w-5 text-indigo-500" />} 
-                    title="Education" 
-                    value={career.education} 
-                  />
-                  <InfoCard 
-                    icon={<DollarSign className="h-5 w-5 text-indigo-500" />} 
-                    title="Avg. Salary" 
-                    value={career.salary} 
-                  />
-                  <InfoCard 
-                    icon={<Users className="h-5 w-5 text-indigo-500" />} 
-                    title="Related Careers" 
-                    value={`${career.relatedCareers.length} options`} 
-                  />
+          </div>
+
+          <Tabs defaultValue="overview" className="p-6">
+            <TabsList className="grid grid-cols-4 mb-6">
+              <TabsTrigger value="overview" className="flex items-center gap-1">
+                <Star className="h-4 w-4" />
+                <span className="hidden sm:inline">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="details" className="flex items-center gap-1">
+                <Book className="h-4 w-4" />
+                <span className="hidden sm:inline">Details</span>
+              </TabsTrigger>
+              <TabsTrigger value="stories" className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Success Stories</span>
+              </TabsTrigger>
+              <TabsTrigger value="advice" className="flex items-center gap-1">
+                <GraduationCap className="h-4 w-4" />
+                <span className="hidden sm:inline">Expert Advice</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-6">
+              <div className="prose max-w-none">
+                <h2 className="text-2xl font-semibold mb-4">Career Overview</h2>
+                <p className="text-gray-700">{career.longDescription}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div className="bg-purple-50 p-5 rounded-lg">
+                  <h3 className="font-semibold text-purple-800 mb-2">Average Salary</h3>
+                  <p className="text-xl font-bold">{career.salary}</p>
+                </div>
+                <div className="bg-purple-50 p-5 rounded-lg">
+                  <h3 className="font-semibold text-purple-800 mb-2">Job Outlook</h3>
+                  <p className="text-xl font-bold">{career.outlook}</p>
+                </div>
+                <div className="bg-purple-50 p-5 rounded-lg">
+                  <h3 className="font-semibold text-purple-800 mb-2">Education Required</h3>
+                  <p className="text-xl font-bold">{career.education}</p>
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold mb-4">Key Skills</h3>
+                <div className="flex flex-wrap gap-2">
+                  {career.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="bg-purple-100 text-purple-800 px-3 py-2 rounded-md text-sm"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold mb-4">Related Careers</h3>
+                <div className="flex flex-wrap gap-2">
+                  {career.relatedCareers.map((related, index) => (
+                    <Link
+                      key={index}
+                      to={`/career/${related.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="bg-gray-100 hover:bg-gray-200 transition-colors px-3 py-2 rounded-md text-sm"
+                    >
+                      {related}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="details">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-semibold mb-4">A Day in the Life</h2>
+                  <p className="text-gray-700">{career.dayInLife}</p>
                 </div>
 
-                <div className="mb-12">
-                  <h2 className="text-2xl font-bold mb-4">About This Career</h2>
-                  <p className="text-gray-700 mb-6 leading-relaxed">{career.longDescription}</p>
-                  
-                  <h3 className="text-xl font-semibold mb-3">Key Skills</h3>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {career.skills.map((skill, index) => (
-                      <span
-                        key={index}
-                        className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
-                      >
-                        {skill}
-                      </span>
+                <div className="mt-8">
+                  <h2 className="text-2xl font-semibold mb-4">Educational Path</h2>
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h3 className="font-semibold mb-2">Recommended Education</h3>
+                    <p className="mb-4">{career.education}</p>
+                    
+                    <h3 className="font-semibold mb-2">Continuing Education</h3>
+                    <p>
+                      Professional certifications and continuing education are important for
+                      staying current in this field. Many {career.title.toLowerCase()}s pursue
+                      specialized training throughout their careers.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <h2 className="text-2xl font-semibold mb-4">Learn More</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {career.videoEmbeds.map((videoId, index) => (
+                      <div key={index} className="aspect-video">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={`https://www.youtube.com/embed/${videoId}`}
+                          title={`${career.title} video ${index + 1}`}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
                     ))}
                   </div>
-                  
-                  <h3 className="text-xl font-semibold mb-3">A Day in the Life</h3>
-                  <p className="text-gray-700 mb-6 leading-relaxed">{career.dayInLife}</p>
                 </div>
+              </div>
+            </TabsContent>
 
-                {career.videoEmbeds.length > 0 && (
-                  <div className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">Watch & Learn</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {career.videoEmbeds.map((videoId, index) => (
-                        <div key={index} className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-md">
-                          <iframe
-                            src={`https://www.youtube.com/embed/${videoId}`}
-                            title={`Career video ${index + 1}`}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="w-full h-full"
-                          ></iframe>
+            <TabsContent value="stories">
+              <h2 className="text-2xl font-semibold mb-6">Success Stories</h2>
+              <div className="space-y-8">
+                {career.successStories.map((story, index) => (
+                  <div key={index} className="bg-gray-50 rounded-lg p-6">
+                    <div className="flex flex-col md:flex-row gap-6">
+                      <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0">
+                        <img
+                          src={story.imageUrl}
+                          alt={story.name}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="mb-4">
+                          <h3 className="text-xl font-semibold">{story.name}</h3>
+                          <p className="text-purple-600">
+                            {story.role} at {story.company}
+                          </p>
                         </div>
-                      ))}
+                        <blockquote className="italic text-gray-700 border-l-4 border-purple-300 pl-4 mb-4">
+                          "{story.quote}"
+                        </blockquote>
+                        <p className="text-gray-700">{story.story}</p>
+                      </div>
                     </div>
                   </div>
-                )}
+                ))}
+              </div>
+            </TabsContent>
 
-                {career.successStories.length > 0 && (
-                  <div className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">Success Stories</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {career.successStories.map((story, index) => (
-                        <SuccessStoryCard key={index} story={story} />
-                      ))}
-                    </div>
-                  </div>
-                )}
+            <TabsContent value="advice">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-semibold mb-2">Get Expert Advice</h2>
+                  <p className="text-gray-600 mb-6">
+                    Have questions about becoming a {career.title}? Submit your question below and
+                    an industry expert will provide personalized advice.
+                  </p>
 
-                {career.relatedCareers.length > 0 && (
-                  <div>
-                    <h2 className="text-2xl font-bold mb-6">Related Careers</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {career.relatedCareers.map((relatedCareer, index) => {
-                        const relatedCareerDetails = careerDetails.find(c => c.title === relatedCareer);
-                        if (!relatedCareerDetails) return null;
-                        
-                        return (
-                          <Link 
-                            key={index}
-                            to={`/career/${relatedCareerDetails.title.toLowerCase().replace(/\s+/g, "-")}`}
-                            className="block"
-                          >
-                            <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                              <h3 className="font-semibold text-indigo-600">{relatedCareer}</h3>
-                              <p className="text-sm text-gray-600 mt-1">
-                                {relatedCareerDetails.description.substring(0, 60)}...
-                              </p>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="advice">
-                <div className="max-w-3xl mx-auto">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-2xl">Ask an Expert in {career.title}</CardTitle>
-                      <p className="text-gray-600 mt-2">
-                        Get personalized advice from professionals currently working in this field.
-                        Our network of experts can answer your specific questions about career paths,
-                        day-to-day responsibilities, or how to break into the industry.
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <ExpertAdviceForm careerField={career.title} />
-                    </CardContent>
-                  </Card>
+                  <ExpertAdviceForm careerField={career.title} />
                 </div>
-              </TabsContent>
-            </Tabs>
-          </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </motion.div>
       </div>
     </div>
-  );
-};
-
-interface InfoCardProps {
-  icon: React.ReactNode;
-  title: string;
-  value: string;
-}
-
-const InfoCard = ({ icon, title, value }: InfoCardProps) => {
-  return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-      <div className="flex items-center mb-2">
-        {icon}
-        <h3 className="font-medium text-gray-700 ml-2">{title}</h3>
-      </div>
-      <div className="text-lg font-semibold text-gray-900">{value}</div>
-    </div>
-  );
-};
-
-interface SuccessStoryCardProps {
-  story: {
-    name: string;
-    role: string;
-    company: string;
-    imageUrl: string;
-    quote: string;
-    story: string;
-  };
-}
-
-const SuccessStoryCard = ({ story }: SuccessStoryCardProps) => {
-  return (
-    <Card className="overflow-hidden">
-      <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-1/3 bg-gray-200">
-          <img 
-            src={story.imageUrl} 
-            alt={story.name} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="w-full md:w-2/3 p-6">
-          <h3 className="font-bold text-xl mb-1">{story.name}</h3>
-          <p className="text-indigo-600 mb-3">
-            {story.role} at {story.company}
-          </p>
-          <p className="italic text-gray-700 mb-4">"{story.quote}"</p>
-          <Separator className="my-4" />
-          <p className="text-gray-600 text-sm">{story.story}</p>
-        </div>
-      </div>
-    </Card>
   );
 };
 

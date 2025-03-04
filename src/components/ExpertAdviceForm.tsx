@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { ExpertAdviceRequest } from "@/components/dashboard/types";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/AuthProvider";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -24,12 +26,13 @@ interface ExpertAdviceFormProps {
 
 const ExpertAdviceForm = ({ careerField }: ExpertAdviceFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      email: "",
+      email: user?.email || "",
       question: "",
       contactConsent: false
     },
@@ -47,18 +50,36 @@ const ExpertAdviceForm = ({ careerField }: ExpertAdviceFormProps) => {
       contactConsent: values.contactConsent
     };
     
-    console.log("Expert advice request submitted:", request);
-    
-    // Simulate API call with a timeout
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Save to Supabase
+      const { error } = await supabase
+        .from('expert_advice_requests')
+        .insert({
+          name: values.name,
+          email: values.email,
+          question: values.question,
+          career_field: careerField,
+          contact_consent: values.contactConsent
+        });
+        
+      if (error) throw error;
+      
       form.reset();
       
       toast({
         title: "Request Submitted",
         description: "An expert in this field will contact you within 3-5 business days.",
       });
-    }, 1500);
+    } catch (error) {
+      console.error("Error submitting expert advice request:", error);
+      toast({
+        title: "Error Submitting Request",
+        description: "There was a problem submitting your request. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

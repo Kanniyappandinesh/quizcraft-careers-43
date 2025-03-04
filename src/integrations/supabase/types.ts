@@ -9,7 +9,144 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      career_details: {
+        Row: {
+          day_in_life: string
+          description: string
+          education: string
+          id: string
+          image_path: string | null
+          long_description: string
+          outlook: string
+          related_careers: Json
+          salary: string
+          skills: Json
+          success_stories: Json
+          title: string
+          video_embeds: Json
+        }
+        Insert: {
+          day_in_life: string
+          description: string
+          education: string
+          id?: string
+          image_path?: string | null
+          long_description: string
+          outlook: string
+          related_careers: Json
+          salary: string
+          skills: Json
+          success_stories: Json
+          title: string
+          video_embeds: Json
+        }
+        Update: {
+          day_in_life?: string
+          description?: string
+          education?: string
+          id?: string
+          image_path?: string | null
+          long_description?: string
+          outlook?: string
+          related_careers?: Json
+          salary?: string
+          skills?: Json
+          success_stories?: Json
+          title?: string
+          video_embeds?: Json
+        }
+        Relationships: []
+      }
+      expert_advice_requests: {
+        Row: {
+          career_field: string
+          contact_consent: boolean
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          question: string
+          status: string
+        }
+        Insert: {
+          career_field: string
+          contact_consent?: boolean
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+          question: string
+          status?: string
+        }
+        Update: {
+          career_field?: string
+          contact_consent?: boolean
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          question?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      quiz_results: {
+        Row: {
+          answers: Json
+          created_at: string | null
+          date: string | null
+          growth_areas: Json
+          id: string
+          matches: Json
+          strengths: Json
+          user_id: string | null
+        }
+        Insert: {
+          answers: Json
+          created_at?: string | null
+          date?: string | null
+          growth_areas: Json
+          id?: string
+          matches: Json
+          strengths: Json
+          user_id?: string | null
+        }
+        Update: {
+          answers?: Json
+          created_at?: string | null
+          date?: string | null
+          growth_areas?: Json
+          id?: string
+          matches?: Json
+          strengths?: Json
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -4,11 +4,26 @@ import QuizContainer from "@/components/QuizContainer";
 import Dashboard from "@/components/Dashboard";
 import DFDDiagram from "@/components/DFDDiagram";
 import { motion } from "framer-motion";
-import { Sparkles, FileDigit } from "lucide-react";
+import { Sparkles, FileDigit, LogOut, LogIn } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showDFD, setShowDFD] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been successfully signed out.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] via-[#e2d1c3] to-[#fdfcfb]">
@@ -32,6 +47,25 @@ const Index = () => {
             >
               {showDashboard ? "Take Quiz" : "View Dashboard"}
             </button>
+            {user ? (
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-white/20"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-white/20"
+                onClick={() => navigate('/auth')}
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       </nav>

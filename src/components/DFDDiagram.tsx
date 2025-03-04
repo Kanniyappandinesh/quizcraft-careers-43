@@ -1,7 +1,42 @@
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const DFDDiagram = () => {
+  const [imageUrl, setImageUrl] = useState<string>("/src/assets/CareerQuestDFD.svg");
+  
+  useEffect(() => {
+    const getStorageUrl = async () => {
+      try {
+        // Check if the image exists in storage
+        const { data, error } = await supabase
+          .storage
+          .from('career_quest_images')
+          .list('diagrams');
+          
+        if (error) throw error;
+        
+        // If we find the DFD image in storage, get its public URL
+        const dfdImage = data?.find(file => file.name.includes('DFD'));
+        if (dfdImage) {
+          const { data: publicUrlData } = supabase
+            .storage
+            .from('career_quest_images')
+            .getPublicUrl(`diagrams/${dfdImage.name}`);
+            
+          if (publicUrlData?.publicUrl) {
+            setImageUrl(publicUrlData.publicUrl);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching DFD image from storage:", error);
+      }
+    };
+    
+    getStorageUrl();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -12,7 +47,7 @@ const DFDDiagram = () => {
       <h2 className="text-2xl font-bold text-center mb-4">Data Flow Diagram</h2>
       <div className="flex justify-center">
         <img 
-          src="/src/assets/CareerQuestDFD.svg" 
+          src={imageUrl} 
           alt="CareerQuest Data Flow Diagram" 
           className="max-w-full h-auto"
         />

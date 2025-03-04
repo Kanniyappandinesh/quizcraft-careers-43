@@ -1,6 +1,15 @@
 
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+import { initializeSupabase } from './utils/supabaseInit.ts';
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Initialize Supabase (will run asynchronously)
+initializeSupabase();
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);

@@ -7,18 +7,23 @@ import ProgressBar from "./ProgressBar";
 import ResultsPage from "./ResultsPage";
 import { AnimatePresence } from "framer-motion";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const QuizContainer = () => {
   const [started, setStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleStart = () => {
     setStarted(true);
   };
 
-  const handleAnswer = (answer: string) => {
+  const handleAnswer = async (answer: string) => {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
@@ -26,16 +31,52 @@ const QuizContainer = () => {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       const matches = getCareerMatches(newAnswers);
-      // Save results with timestamp and detailed analysis
-      const savedResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
+      
+      // Calculate strengths and growth areas
+      const strengths = calculateStrengths(newAnswers);
+      const growthAreas = identifyGrowthAreas(newAnswers);
+      
+      // Save results to local storage for immediate use
       const newResult = {
         date: new Date().toISOString(),
         matches,
         answers: newAnswers,
-        strengths: calculateStrengths(newAnswers),
-        growthAreas: identifyGrowthAreas(newAnswers)
+        strengths,
+        growthAreas
       };
+      
+      const savedResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
       localStorage.setItem('quizResults', JSON.stringify([newResult, ...savedResults].slice(0, 10)));
+      
+      // If user is logged in, save to Supabase
+      if (user) {
+        try {
+          const { error } = await supabase
+            .from('quiz_results')
+            .insert({
+              user_id: user.id,
+              answers: newAnswers,
+              matches: matches,
+              strengths: strengths,
+              growth_areas: growthAreas
+            });
+            
+          if (error) throw error;
+        } catch (error: any) {
+          console.error("Error saving quiz results:", error);
+          toast({
+            title: "Error saving results",
+            description: "Your results couldn't be saved to your account, but they're available locally.",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({
+          title: "Results saved locally",
+          description: "Sign in to save your results to your account and access them from anywhere.",
+        });
+      }
+
       toast({
         title: "Analysis Complete! 🎉",
         description: "View your personalized career insights in the dashboard.",
