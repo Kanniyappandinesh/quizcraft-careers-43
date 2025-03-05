@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +20,7 @@ const CareerPage = () => {
       setLoading(true);
       try {
         const { data, error } = await supabase
-          .from('careers')
+          .from('career_details')  // Changed from 'careers' to 'career_details'
           .select('*')
           .eq('id', careerId)
           .single();
@@ -117,7 +118,7 @@ const CareerPage = () => {
               <Card className="shadow-lg border-0">
                 <CardContent>
                   <ul className="list-disc pl-5">
-                    {career.requirements.map((req: string, index: number) => (
+                    {Array.isArray(career.skills) && career.skills.map((req: string, index: number) => (
                       <li key={index}>{req}</li>
                     ))}
                   </ul>
